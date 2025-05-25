@@ -299,8 +299,8 @@ class CTFToolkitApp(App):
     CSS = """
     .tab-header {
         text-style: bold;
-        background: $primary;
-        color: $text;
+        background: green 50%;
+        color: white;
         padding: 1;
         margin-bottom: 1;
     }

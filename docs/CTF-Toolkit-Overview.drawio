@@ -1,77 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-      <mxfile host="codeviz.app" modified="2025-05-24T16:59:25.272Z" agent="CodeViz Exporter" version="14.6.5" type="device">
+      <mxfile host="codeviz.app" modified="2025-05-25T11:00:54.568Z" agent="CodeViz Exporter" version="14.6.5" type="device">
         <diagram id="codeviz-diagram" name="System Diagram">
           <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
             <root>
               <mxCell id="0"/>
               <mxCell id="1" parent="0"/>
               <mxCell id="180" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="1">
+                <mxGeometry x="121.07891561478687" y="806" width="486.3156624591476" height="244.07891561478687" as="geometry"/>
+              </mxCell>
+              <mxCell id="180_label" value="External Systems" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="1">
+                <mxGeometry x="129.07891561478687" y="814" width="410.3156624591476" height="24" as="geometry"/>
+              </mxCell>
+<mxCell id="181" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="1">
                 <mxGeometry x="22" y="252" width="882.6313249182951" height="429.07891561478687" as="geometry"/>
               </mxCell>
-              <mxCell id="180_label" value="CTF TUI Application&lt;br&gt;Python / Textual" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="1">
+              <mxCell id="181_label" value="CTF Toolkit TUI&lt;br&gt;Python / Textual" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="1">
                 <mxGeometry x="30" y="260" width="806.6313249182951" height="24" as="geometry"/>
               </mxCell>
-<mxCell id="188" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="1">
-                <mxGeometry x="1082.789156147869" y="917" width="486.31566245914746" height="244.07891561478687" as="geometry"/>
-              </mxCell>
-              <mxCell id="188_label" value="External Systems" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="1">
-                <mxGeometry x="1090.789156147869" y="925" width="410.31566245914746" height="24" as="geometry"/>
-              </mxCell>
-<mxCell id="189" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="1">
-                <mxGeometry x="884.6313249182951" y="252" width="882.6313249182951" height="604.0789156147869" as="geometry"/>
-              </mxCell>
-              <mxCell id="189_label" value="CTF TUI Application&lt;br&gt;Python / Textual" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="1">
-                <mxGeometry x="892.6313249182951" y="260" width="806.6313249182951" height="24" as="geometry"/>
-              </mxCell>
-              <mxCell id="186" value="User&lt;br&gt;External Actor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="1">
-                    <mxGeometry x="102.4473493688721" y="12" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
+              <mxCell id="189" value="User&lt;br&gt;External Actor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="1">
+                    <mxGeometry x="102.44734936887211" y="12" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
                   </mxCell>
-<mxCell id="187" value="LLM APIs&lt;br&gt;e.g., OpenAI, Vertex AI, etc." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="1">
-                    <mxGeometry x="646.4734936887214" y="777" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
-                  </mxCell>
-<mxCell id="190" value="User&lt;br&gt;External Actor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="1">
-                    <mxGeometry x="965.0786742871672" y="12" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
-                  </mxCell>
-<mxCell id="181" value="Main Application &amp;amp; UI&lt;br&gt;Python / Textual" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="180">
+<mxCell id="182" value="TUI Application Core&lt;br&gt;Python / Textual" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="181">
                     <mxGeometry x="90.44734936887212" y="120" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
                   </mxCell>
-<mxCell id="182" value="Terminal Management&lt;br&gt;Python Logic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="180">
-                    <mxGeometry x="238.1578312295738" y="295" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
-                  </mxCell>
-<mxCell id="183" value="Markdown Processing&lt;br&gt;Python Logic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="180">
+<mxCell id="183" value="Terminal Management&lt;br&gt;Python / subprocess" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="181">
                     <mxGeometry x="40" y="305" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
                   </mxCell>
-<mxCell id="184" value="LLM Interaction Logic&lt;br&gt;Python Logic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="180">
-                    <mxGeometry x="634.4734936887214" y="275" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
-                  </mxCell>
-<mxCell id="185" value="Plugin Management&lt;br&gt;Python Logic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="180">
-                    <mxGeometry x="436.3156624591476" y="285" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
-                  </mxCell>
-<mxCell id="191" value="TUI Application Core&lt;br&gt;Python / Textual" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="189">
-                    <mxGeometry x="90.44734936887212" y="120" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
-                  </mxCell>
-<mxCell id="192" value="LLM Interaction Module&lt;br&gt;Python" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="189">
-                    <mxGeometry x="40" y="305" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
-                  </mxCell>
-<mxCell id="193" value="Markdown Content Module&lt;br&gt;Python" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="189">
+<mxCell id="184" value="Markdown Processing&lt;br&gt;Python" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="181">
                     <mxGeometry x="238.1578312295738" y="295" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
                   </mxCell>
-<mxCell id="194" value="Plugin Management Module&lt;br&gt;Python" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="189">
+<mxCell id="185" value="LLM Interaction Logic&lt;br&gt;Python" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="181">
                     <mxGeometry x="436.3156624591476" y="285" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
                   </mxCell>
-<mxCell id="195" value="Terminal Interaction Module&lt;br&gt;Python" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="189">
+<mxCell id="186" value="Plugin Management Logic&lt;br&gt;Python" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="181">
                     <mxGeometry x="634.4734936887214" y="275" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
                   </mxCell>
-<mxCell id="196" value="Knowledge Base&lt;br&gt;Markdown Files" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="189">
-                    <mxGeometry x="238.1578312295738" y="480" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
-                  </mxCell>
-<mxCell id="197" value="AI APIs&lt;br&gt;e.g. OpenAI, Vertex AI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="188">
+<mxCell id="187" value="AI APIs&lt;br&gt;e.g. OpenAI, Vertex AI, etc." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="180">
                     <mxGeometry x="40" y="120" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
                   </mxCell>
-<mxCell id="198" value="Operating System Shell&lt;br&gt;OS Commands" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="188">
+<mxCell id="188" value="Operating System Shell&lt;br&gt;Local OS / subprocess" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="180">
                     <mxGeometry x="238.1578312295738" y="120" width="168.1578312295738" height="84.0789156147869" as="geometry"/>
                   </mxCell>
-              <mxCell id="edge-86" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="186" target="181">
+              <mxCell id="edge-86" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="189" target="182">
                   <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="edge-86_label" value="interacts with" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-86">
@@ -79,106 +49,50 @@
                     <mxPoint as="offset"/>
                   </mxGeometry>
                 </mxCell>
-<mxCell id="edge-82" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="181" target="182">
+<mxCell id="edge-82" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="182" target="183">
                   <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="edge-82_label" value="manages" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-82">
+                <mxCell id="edge-82_label" value="orchestrates" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-82">
                   <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
                     <mxPoint as="offset"/>
                   </mxGeometry>
                 </mxCell>
-<mxCell id="edge-83" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="181" target="183">
+<mxCell id="edge-83" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="182" target="184">
                   <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="edge-83_label" value="displays via" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-83">
+                <mxCell id="edge-83_label" value="orchestrates" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-83">
                   <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
                     <mxPoint as="offset"/>
                   </mxGeometry>
                 </mxCell>
-<mxCell id="edge-84" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="181" target="184">
+<mxCell id="edge-84" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="182" target="185">
                   <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="edge-84_label" value="delegates to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-84">
+                <mxCell id="edge-84_label" value="orchestrates" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-84">
                   <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
                     <mxPoint as="offset"/>
                   </mxGeometry>
                 </mxCell>
-<mxCell id="edge-85" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="181" target="185">
+<mxCell id="edge-85" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="182" target="186">
                   <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="edge-85_label" value="manages" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-85">
+                <mxCell id="edge-85_label" value="orchestrates" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-85">
                   <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
                     <mxPoint as="offset"/>
                   </mxGeometry>
                 </mxCell>
-<mxCell id="edge-87" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="184" target="187">
+<mxCell id="edge-88" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="185" target="187">
                   <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="edge-87_label" value="calls" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-87">
+                <mxCell id="edge-88_label" value="queries" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-88">
                   <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
                     <mxPoint as="offset"/>
                   </mxGeometry>
                 </mxCell>
-<mxCell id="edge-101" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="190" target="191">
+<mxCell id="edge-87" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="183" target="188">
                   <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="edge-101_label" value="interacts with" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-101">
-                  <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
-                    <mxPoint as="offset"/>
-                  </mxGeometry>
-                </mxCell>
-<mxCell id="edge-96" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="191" target="192">
-                  <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="edge-96_label" value="uses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-96">
-                  <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
-                    <mxPoint as="offset"/>
-                  </mxGeometry>
-                </mxCell>
-<mxCell id="edge-97" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="191" target="193">
-                  <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="edge-97_label" value="uses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-97">
-                  <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
-                    <mxPoint as="offset"/>
-                  </mxGeometry>
-                </mxCell>
-<mxCell id="edge-98" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="191" target="194">
-                  <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="edge-98_label" value="uses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-98">
-                  <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
-                    <mxPoint as="offset"/>
-                  </mxGeometry>
-                </mxCell>
-<mxCell id="edge-99" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="191" target="195">
-                  <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="edge-99_label" value="uses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-99">
-                  <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
-                    <mxPoint as="offset"/>
-                  </mxGeometry>
-                </mxCell>
-<mxCell id="edge-100" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="193" target="196">
-                  <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="edge-100_label" value="reads from" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-100">
-                  <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
-                    <mxPoint as="offset"/>
-                  </mxGeometry>
-                </mxCell>
-<mxCell id="edge-102" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="192" target="197">
-                  <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="edge-102_label" value="calls" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-102">
-                  <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
-                    <mxPoint as="offset"/>
-                  </mxGeometry>
-                </mxCell>
-<mxCell id="edge-103" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="195" target="198">
-                  <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="edge-103_label" value="executes commands via" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-103">
+                <mxCell id="edge-87_label" value="executes commands in" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-87">
                   <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
                     <mxPoint as="offset"/>
                   </mxGeometry>
