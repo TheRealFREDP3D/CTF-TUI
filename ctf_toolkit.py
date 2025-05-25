@@ -4,6 +4,10 @@ CTF Toolkit TUI - Proof of Concept
 A demonstration of the core UI structure and functionality
 """
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import asyncio
 import subprocess
 from datetime import datetime
@@ -19,6 +23,8 @@ from textual.widgets import (
 from textual.binding import Binding
 from textual.message import Message
 
+from litellm import acompletion
+import os
 
 # =============================================================================
 # MANAGERS - Business Logic Layer
@@ -75,27 +81,38 @@ class MarkdownManager:
 
 
 class LLMManager:
-    """Handles LLM integration (mocked for POC)"""
+    """Handles LLM integration using LiteLLM"""
     
     def __init__(self):
-        self.providers = ["OpenAI GPT-4", "Anthropic Claude", "OpenRouter", "Local Ollama"]
-        self.current_provider = self.providers[0]
         self.conversation_history = []
+        # Read model from environment variable
+        model_env = os.getenv("LITELLM_MODEL", "gpt-4")
+        self.model = model_env # Store the full model name, e.g., "ollama/mistral" or "gpt-4"
     
     async def query_llm(self, prompt: str, context: str = "") -> str:
-        """Query the LLM (mocked response for POC)"""
-        # Simulate API delay
-        await asyncio.sleep(1)
-        
-        # Mock responses based on keywords
-        if "base64" in prompt.lower():
-            return "🔍 I see base64 data! Try: `echo 'your_data' | base64 -d`"
-        elif "reverse" in prompt.lower():
-            return "🔧 For reverse engineering, try: `strings`, `objdump`, `radare2`, or `ghidra`"
-        elif "crypto" in prompt.lower():
-            return "🔐 Crypto challenge detected! Consider: frequency analysis, Caesar cipher, XOR, or RSA"
-        else:
-            return f"🤖 Mock LLM Response to: '{prompt}'\n\nThis would be a real AI response in production!"
+        """Query the LLM via LiteLLM"""
+        try:
+            # Build messages like Chat API expects
+            messages = [{"role": "system", "content": context}] if context else []
+            messages.append({"role": "user", "content": prompt})
+            
+            response = await acompletion(
+                model=self.model,
+                messages=messages,
+                stream=False,  # Set True if you want streaming later
+            )
+            # Extract content from the response
+            # Extract content from the response
+            # Pylance may incorrectly infer 'response' as CustomStreamWrapper here.
+            # LiteLLM documentation states acompletion(stream=False) returns a ModelResponse.
+            content = response.choices[0].message.content # type: ignore[attr-defined]
+            if content is None:
+                # Consider logging this case or raising a more specific error
+                return "⚠️ LLM returned no content."
+            return content
+        except Exception as e:
+            # Handle errors during the API call
+            return f"⚠️ LLM error: {e}"
 
 
 class PluginManager:
@@ -211,19 +228,20 @@ class AITab(Container):
     def compose(self) -> ComposeResult:
         yield Static("🤖 AI Assistant", classes="tab-header")
         
-        with Horizontal():
-            yield Label("Provider:")
-            yield Select(
-                [(provider, provider) for provider in self.llm_manager.providers],
-                value=self.llm_manager.current_provider,
-                id="llm-provider"
-            )
-        
-        yield TextArea("", id="ai-conversation", read_only=True)
+        # Removed provider selection as LiteLLM handles this via config
+        # with Horizontal():
+        #     yield Label("Provider:")
+        #     yield Select(
+        #         [(provider, provider) for provider in self.llm_manager.providers],
+        #         value=self.llm_manager.current_provider,
+        #         id="llm-provider"
+        #     )
         
         with Horizontal():
             yield Input(placeholder="Ask the AI about your CTF challenge...", id="ai-input")
             yield Button("Send", id="ai-send", variant="primary")
+
+        yield TextArea("", id="ai-conversation", read_only=True)
     
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "ai-send":
@@ -299,7 +317,7 @@ class CTFToolkitApp(App):
     CSS = """
     .tab-header {
         text-style: bold;
-        background: green 50%;
+        background: green;
         color: white;
         padding: 1;
         margin-bottom: 1;

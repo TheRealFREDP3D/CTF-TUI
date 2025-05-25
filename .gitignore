@@ -189,3 +189,4 @@ cython_debug/
 /.venv
 /.vscode
 /appmap.log
+=0.40.0

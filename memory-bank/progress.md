@@ -19,10 +19,10 @@ The project is currently a Proof of Concept demonstrating core functionality. Th
 - Enhance error handling and UX (graceful fallbacks, loading indicators).
 - Strengthen security and configuration (environment variables for API keys, input sanitization).
 - Improve testing and debugging practices (subprocess mocking, structured logging).
-- Abstract LLM providers for a future-proof architecture.
-- Plan for packaging and distribution with PyInstaller.
+- Integrate LiteLLM for LLM abstraction.
+- Planning for packaging and distribution with PyInstaller.
 - Create comprehensive documentation, including a TUI cheat sheet.
-- Real LLM API integration (incorporating abstraction).
+- Real LLM API integration (incorporating LiteLLM).
 - Plugin auto-discovery and installation.
 - Configuration file management (implementing validation and secure handling).
 - Persistent session data.
