@@ -25,6 +25,7 @@ from textual.message import Message
 
 from litellm import acompletion
 import os
+import random
 
 # =============================================================================
 # MANAGERS - Business Logic Layer
@@ -104,11 +105,23 @@ class MarkdownManager:
     """Handles markdown note taking and rendering"""
     
     def __init__(self):
-        self.current_note = "# CTF Toolkit Notes\n\n*Start taking notes...*"
+        self.notes_file = Path("ctf_notes.md")
+        self.current_note = "# CTF Toolkit Notes\n\n*Start taking notes...*" # Default content
+        if self.notes_file.exists():
+            try:
+                self.current_note = self.notes_file.read_text(encoding="utf-8")
+            except (IOError, OSError) as e:
+                print(f"Error loading notes from {self.notes_file}: {e}")
+                # Keep default content if loading fails
     
     def update_content(self, content: str):
-        """Update the current markdown content"""
+        """Update the current markdown content and save to file"""
         self.current_note = content
+        try:
+            self.notes_file.write_text(self.current_note, encoding="utf-8")
+        except (IOError, OSError) as e:
+            print(f"Error saving notes to {self.notes_file}: {e}")
+            # Optionally, notify the user here if a more sophisticated error handling is needed
     
     def get_rendered_content(self) -> str:
         """Get the current markdown content"""
@@ -123,12 +136,14 @@ class LLMManager:
         # Read model from environment variable
         model_env = os.getenv("LITELLM_MODEL", "gpt-4")
         self.model = model_env # Store the full model name, e.g., "ollama/mistral" or "gpt-4"
+        self.available_models = ["gpt-4", "ollama/mistral", "claude-2", "gpt-3.5-turbo"]
     
     async def query_llm(self, prompt: str, context: str = "") -> str:
         """Query the LLM via LiteLLM"""
         try:
             # Build messages like Chat API expects
             messages = [{"role": "system", "content": context}] if context else []
+            messages.extend(self.conversation_history) # Prepend conversation history
             messages.append({"role": "user", "content": prompt})
             
             response = await acompletion(
@@ -144,10 +159,19 @@ class LLMManager:
             if content is None:
                 # Consider logging this case or raising a more specific error
                 return "⚠️ LLM returned no content."
+            
+            # Append to conversation history
+            self.conversation_history.append({"role": "user", "content": prompt})
+            self.conversation_history.append({"role": "assistant", "content": content})
+            
             return content
         except Exception as e:
             # Handle errors during the API call
             return f"⚠️ LLM error: {e}"
+
+    def set_model(self, model_name: str):
+        """Sets the LLM model."""
+        self.model = model_name
 
 
 class PluginManager:
@@ -165,6 +189,12 @@ class PluginManager:
     def get_plugins(self):
         """Get list of available plugins"""
         return self.plugins
+
+    def refresh_plugins(self):
+        """Simulates refreshing plugin statuses."""
+        possible_statuses = ["Installed", "Available", "Not Found"]
+        for plugin in self.plugins:
+            plugin['status'] = random.choice(possible_statuses)
 
 
 # =============================================================================
@@ -265,21 +295,26 @@ class AITab(Container):
     def compose(self) -> ComposeResult:
         yield Static("🤖 AI Assistant", classes="tab-header")
         
-        # Removed provider selection as LiteLLM handles this via config
-        # with Horizontal():
-        #     yield Label("Provider:")
-        #     yield Select(
-        #         [(provider, provider) for provider in self.llm_manager.providers],
-        #         value=self.llm_manager.current_provider,
-        #         id="llm-provider"
-        #     )
+        with Horizontal():
+            yield Label("Model:")
+            yield Select(
+                [(model, model) for model in self.llm_manager.available_models],
+                value=self.llm_manager.model,
+                id="llm-model-select"
+            )
         
         with Horizontal():
             yield Input(placeholder="Ask the AI about your CTF challenge...", id="ai-input")
             yield Button("Send", id="ai-send", variant="primary")
 
         yield TextArea("", id="ai-conversation", read_only=True)
-    
+
+    async def on_select_changed(self, event: Select.Changed) -> None:
+        """Handle model selection change."""
+        if event.select.id == "llm-model-select":
+            if event.value is not None: # Ensure event.value is not None
+                self.llm_manager.set_model(str(event.value))
+
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "ai-send":
             await self.send_ai_query()
@@ -297,16 +332,50 @@ class AITab(Container):
         if not query:
             return
         
-        # Clear input and show thinking
+        # Clear input
         input_widget.value = ""
-        conversation_widget.text += f"\n🧑 You: {query}\n\n🤖 AI: [Thinking...]\n"
+        
+        # Append user's query
+        conversation_widget.text += f"\n🧑 You: {query}\n"
+        
+        # Placeholder for AI response
+        thinking_message = f"\n🤖 AI ({self.llm_manager.model}): [Thinking...]\n"
+        conversation_widget.text += thinking_message
+        conversation_widget.scroll_end(animate=False)
         
         # Get AI response
         response = await self.llm_manager.query_llm(query)
         
-        # Update conversation
-        conversation_widget.text = conversation_widget.text.replace("[Thinking...]", response)
-        conversation_widget.text += "\n" + "─" * 50 + "\n"
+        # Update conversation: Replace only the last "[Thinking...]"
+        # A simple approach: find the last occurrence of the specific thinking message
+        last_thinking_index = conversation_widget.text.rfind(thinking_message.strip()) # Use strip to match text area content
+        
+        if last_thinking_index != -1:
+            # Calculate the start and end of the placeholder text to replace
+            placeholder_start_index = last_thinking_index
+            # We need to be careful if "[Thinking...]" is part of the actual model name, though unlikely.
+            # The replacement logic relies on replacing the *entire* "🤖 AI (model): [Thinking...]" line.
+            # For robustness, we replace the entire line.
+            
+            # Find the end of the "Thinking..." line
+            end_of_thinking_line = conversation_widget.text.find("\n", placeholder_start_index)
+            if end_of_thinking_line == -1: # If it's the last line
+                end_of_thinking_line = len(conversation_widget.text)
+
+            # Construct the new AI response line
+            new_ai_response_line = f"\n🤖 AI ({self.llm_manager.model}): {response}\n"
+
+            # Replace the placeholder line with the actual response line
+            conversation_widget.text = (
+                conversation_widget.text[:placeholder_start_index] +
+                new_ai_response_line +
+                conversation_widget.text[end_of_thinking_line:]
+            )
+        else: # Fallback if "[Thinking...]" wasn't found (should not happen in normal flow)
+            conversation_widget.text += f"\n🤖 AI ({self.llm_manager.model}): {response}\n" # Append if placeholder not found
+
+        conversation_widget.text += "─" * 50 + "\n"
+        conversation_widget.scroll_end(animate=False)
 
 
 class PluginTab(Container):
@@ -340,7 +409,29 @@ class PluginTab(Container):
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "refresh-plugins":
-            self.notify("🔄 Plugin refresh would happen here!")
+            # Call the refresh logic in the manager
+            self.plugin_manager.refresh_plugins()
+            
+            # Get the DataTable widget
+            table = self.query_one(DataTable)
+            
+            # Clear existing rows
+            table.clear()
+            
+            # Re-populate the table
+            for plugin in self.plugin_manager.get_plugins():
+                status_emoji = {
+                    "Installed": "✅",
+                    "Available": "📦", 
+                    "Not Found": "❌"
+                }.get(plugin["status"], "❓")
+                
+                table.add_row(
+                    plugin["name"],
+                    f"{status_emoji} {plugin['status']}",
+                    plugin["description"]
+                )
+            # self.notify("🔄 Plugin refresh would happen here!") # Removed as per requirement
 
 
 # =============================================================================

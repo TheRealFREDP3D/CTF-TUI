@@ -7,9 +7,9 @@ The CTF Toolkit provides an integrated environment combining terminal operations
 ## Key Features
 
 *   **Integrated Terminal:** Execute system commands directly within the application, with history and working directory management.
-*   **Markdown Notes:** Take and manage notes using a live markdown editor with real-time preview.
-*   **AI Assistant:** Leverage AI (multiple LLM providers planned) for context-aware assistance during challenges.
-*   **Plugin Management:** Discover, track, and manage external CTF tools and utilities.
+*   **Persistent Markdown Notes:** Take and manage notes using a live markdown editor with real-time preview (notes saved to `ctf_notes.md`).
+*   **Context-Aware AI Assistant:** Leverage AI for assistance with conversation history and selectable LLM models (e.g., GPT-4, Mistral, Claude).
+*   **Plugin Management:** Track external CTF tools and utilities with a mock refresh capability to simulate status changes.
 *   **Keyboard-Driven Interface:** Navigate and operate the toolkit efficiently using keyboard shortcuts.
 
 ## Technology Stack
@@ -43,9 +43,9 @@ This project is currently in the **Proof of Concept (PoC)** stage. Core function
 
 **Current Implemented Features:**
 *   Functional terminal command execution
-*   Live markdown editing and preview
-*   Mock AI assistant responses
-*   Plugin status display (for predefined tools)
+*   Live markdown editing and preview (with persistence to `ctf_notes.md`)
+*   AI assistant with conversation history and selectable models (via LiteLLM, e.g., GPT-4, Mistral, Claude)
+*   Plugin status display with mock refresh capability (for predefined tools)
 *   Keyboard navigation
 
 **Roadmap / Production Readiness Requirements:**
