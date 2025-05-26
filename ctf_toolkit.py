@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
-CTF Toolkit TUI - Proof of Concept
-A demonstration of the core UI structure and functionality
+CTF Toolkit TUI - A Textual-based Interface for CTF Operations.
+
+This script provides a Terminal User Interface (TUI) to assist with common
+Capture The Flag (CTF) tasks. It includes features like an integrated terminal,
+markdown note-taking, an AI assistant, and a plugin/tool manager.
+
+This version is a Proof of Concept, demonstrating the core UI structure
+and foundational functionality of these components.
 """
 
 from dotenv import load_dotenv
@@ -25,103 +31,151 @@ from textual.message import Message
 
 from litellm import acompletion
 import os
-import random
 
 # =============================================================================
 # MANAGERS - Business Logic Layer
 # =============================================================================
 
 class TerminalManager:
-    """Handles command execution and terminal operations"""
+    """
+    Manages terminal operations, including command execution and history.
+
+    This class is responsible for running shell commands in a non-blocking way,
+    capturing their stdout and stderr streams, and maintaining a history of
+    executed commands.
+    """
     
     def __init__(self):
-        self.history = []
-        self.current_dir = Path.cwd()
+        """
+        Initializes the TerminalManager.
+        
+        Sets up an empty command history list and sets the initial current
+        directory to the directory from which the script was launched.
+        """
+        self.history: list[dict[str, str]] = []
+        self.current_dir: Path = Path.cwd()
     
     async def execute_command(self, command: str) -> AsyncGenerator[Tuple[str, Any], None]:
-        """Execute a command and yield output incrementally"""
+        """
+        Executes a shell command asynchronously and yields its output incrementally.
+
+        The output is yielded as tuples, where the first element is the stream
+        type ('stdout', 'stderr', 'error', 'returncode') and the second element
+        is the corresponding data.
+
+        Args:
+            command: The shell command string to execute.
+
+        Yields:
+            Tuple[str, Any]: A tuple containing the output type and the data.
+                             Possible types are:
+                             - ('stdout', str): A line from standard output.
+                             - ('stderr', str): A line from standard error.
+                             - ('error', str): An error message if an exception occurred
+                                               during command setup or execution.
+                             - ('returncode', int): The exit code of the command.
+        
+        Raises:
+            RuntimeError: If the subprocess fails to provide stdout/stderr streams.
+                          (This is caught internally and yielded as an 'error' event).
+        """
         try:
-            # Add to history
+            # Record command in history
             self.history.append({
                 'command': command,
                 'timestamp': datetime.now().strftime('%H:%M:%S'),
                 'cwd': str(self.current_dir)
             })
             
-            # Execute command
+            # Launch the command as a subprocess
+            # Note: Using shell=True can be a security risk if `command` comes from
+            # untrusted input. For this PoC, it's assumed to be from user input
+            # within the TUI.
             process = await asyncio.create_subprocess_shell(
                 command,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                cwd=str(self.current_dir)
+                cwd=str(self.current_dir) # Execute in the manager's current directory
             )
 
+            # Ensure stdout and stderr streams were successfully captured
             if process.stdout is None or process.stderr is None:
+                # This should ideally not happen with PIPE, but good to check.
                 raise RuntimeError("Failed to get stdout/stderr streams from subprocess.")
 
+            # Queues to hold lines from stdout and stderr
             stdout_queue: asyncio.Queue[str] = asyncio.Queue()
             stderr_queue: asyncio.Queue[str] = asyncio.Queue()
 
+            # Create tasks to read from stdout and stderr streams concurrently
+            # and put lines into their respective queues.
             stdout_task = asyncio.create_task(self._enqueue_stream(process.stdout, stdout_queue))
             stderr_task = asyncio.create_task(self._enqueue_stream(process.stderr, stderr_queue))
 
-            # Continuously yield output as it becomes available
+            # Main loop to yield output as it becomes available from the queues
             while True:
                 stdout_done = stdout_task.done()
                 stderr_done = stderr_task.done()
                 stdout_empty = stdout_queue.empty()
                 stderr_empty = stderr_queue.empty()
 
+                # Exit condition: both stream reading tasks are done, and their queues are empty.
                 if stdout_done and stderr_done and stdout_empty and stderr_empty:
-                    break # All tasks finished and queues are empty
+                    break
 
+                # Yield lines from stdout if available
                 if not stdout_empty:
                     yield ('stdout', await stdout_queue.get())
+                
+                # Yield lines from stderr if available
                 if not stderr_empty:
                     yield ('stderr', await stderr_queue.get())
                 
-                # If both queues are empty but tasks are not done, wait a bit
+                # If queues are empty but tasks are still running,
+                # sleep briefly to prevent busy-waiting and allow other tasks to run.
                 if stdout_empty and stderr_empty and (not stdout_done or not stderr_done):
-                    await asyncio.sleep(0.001) # Small sleep to prevent busy waiting
+                    await asyncio.sleep(0.001)
 
-            await asyncio.gather(stdout_task, stderr_task) # Ensure stream reading tasks are truly complete
-            await process.wait() # Wait for the process to finish
+            # Ensure both stream reading tasks have fully completed.
+            await asyncio.gather(stdout_task, stderr_task)
+            # Wait for the subprocess itself to terminate.
+            await process.wait()
+            # Yield the final return code of the command.
             yield ('returncode', process.returncode or 0)
 
         except Exception as e:
+            # If any other exception occurs (e.g., command not found, permission issues),
+            # yield an error message and a non-zero return code.
             yield ('error', str(e))
-            yield ('returncode', 1)
+            yield ('returncode', 1) # Indicate failure
 
-    async def _enqueue_stream(self, stream: asyncio.StreamReader, queue: asyncio.Queue[str]):
-        """Helper to read from a stream and put lines into a queue"""
+    async def _enqueue_stream(self, stream: asyncio.StreamReader, queue: asyncio.Queue[str]) -> None:
+        """
+        Asynchronously reads lines from a stream and puts them into a queue.
+
+        This helper function is used to concurrently process stdout and stderr
+        of a subprocess. It decodes lines as UTF-8, replacing errors.
+
+        Args:
+            stream: The asyncio.StreamReader to read from (e.g., process.stdout).
+            queue: The asyncio.Queue to put the read lines into.
+        """
         while True:
-            line = await stream.readline()
-            if not line:
+            line_bytes = await stream.readline()
+            if not line_bytes: # EOF
                 break
-            await queue.put(line.decode('utf-8', errors='replace'))
+            await queue.put(line_bytes.decode('utf-8', errors='replace'))
 
 
 class MarkdownManager:
     """Handles markdown note taking and rendering"""
     
     def __init__(self):
-        self.notes_file = Path("ctf_notes.md")
-        self.current_note = "# CTF Toolkit Notes\n\n*Start taking notes...*" # Default content
-        if self.notes_file.exists():
-            try:
-                self.current_note = self.notes_file.read_text(encoding="utf-8")
-            except (IOError, OSError) as e:
-                print(f"Error loading notes from {self.notes_file}: {e}")
-                # Keep default content if loading fails
+        self.current_note = "# CTF Toolkit Notes\n\n*Start taking notes...*"
     
     def update_content(self, content: str):
-        """Update the current markdown content and save to file"""
+        """Update the current markdown content"""
         self.current_note = content
-        try:
-            self.notes_file.write_text(self.current_note, encoding="utf-8")
-        except (IOError, OSError) as e:
-            print(f"Error saving notes to {self.notes_file}: {e}")
-            # Optionally, notify the user here if a more sophisticated error handling is needed
     
     def get_rendered_content(self) -> str:
         """Get the current markdown content"""
@@ -136,14 +190,12 @@ class LLMManager:
         # Read model from environment variable
         model_env = os.getenv("LITELLM_MODEL", "gpt-4")
         self.model = model_env # Store the full model name, e.g., "ollama/mistral" or "gpt-4"
-        self.available_models = ["gpt-4", "ollama/mistral", "claude-2", "gpt-3.5-turbo"]
     
     async def query_llm(self, prompt: str, context: str = "") -> str:
         """Query the LLM via LiteLLM"""
         try:
             # Build messages like Chat API expects
             messages = [{"role": "system", "content": context}] if context else []
-            messages.extend(self.conversation_history) # Prepend conversation history
             messages.append({"role": "user", "content": prompt})
             
             response = await acompletion(
@@ -159,19 +211,10 @@ class LLMManager:
             if content is None:
                 # Consider logging this case or raising a more specific error
                 return "⚠️ LLM returned no content."
-            
-            # Append to conversation history
-            self.conversation_history.append({"role": "user", "content": prompt})
-            self.conversation_history.append({"role": "assistant", "content": content})
-            
             return content
         except Exception as e:
             # Handle errors during the API call
             return f"⚠️ LLM error: {e}"
-
-    def set_model(self, model_name: str):
-        """Sets the LLM model."""
-        self.model = model_name
 
 
 class PluginManager:
@@ -189,12 +232,6 @@ class PluginManager:
     def get_plugins(self):
         """Get list of available plugins"""
         return self.plugins
-
-    def refresh_plugins(self):
-        """Simulates refreshing plugin statuses."""
-        possible_statuses = ["Installed", "Available", "Not Found"]
-        for plugin in self.plugins:
-            plugin['status'] = random.choice(possible_statuses)
 
 
 # =============================================================================
@@ -295,26 +332,21 @@ class AITab(Container):
     def compose(self) -> ComposeResult:
         yield Static("🤖 AI Assistant", classes="tab-header")
         
-        with Horizontal():
-            yield Label("Model:")
-            yield Select(
-                [(model, model) for model in self.llm_manager.available_models],
-                value=self.llm_manager.model,
-                id="llm-model-select"
-            )
+        # Removed provider selection as LiteLLM handles this via config
+        # with Horizontal():
+        #     yield Label("Provider:")
+        #     yield Select(
+        #         [(provider, provider) for provider in self.llm_manager.providers],
+        #         value=self.llm_manager.current_provider,
+        #         id="llm-provider"
+        #     )
         
         with Horizontal():
             yield Input(placeholder="Ask the AI about your CTF challenge...", id="ai-input")
             yield Button("Send", id="ai-send", variant="primary")
 
         yield TextArea("", id="ai-conversation", read_only=True)
-
-    async def on_select_changed(self, event: Select.Changed) -> None:
-        """Handle model selection change."""
-        if event.select.id == "llm-model-select":
-            if event.value is not None: # Ensure event.value is not None
-                self.llm_manager.set_model(str(event.value))
-
+    
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "ai-send":
             await self.send_ai_query()
@@ -332,50 +364,16 @@ class AITab(Container):
         if not query:
             return
         
-        # Clear input
+        # Clear input and show thinking
         input_widget.value = ""
-        
-        # Append user's query
-        conversation_widget.text += f"\n🧑 You: {query}\n"
-        
-        # Placeholder for AI response
-        thinking_message = f"\n🤖 AI ({self.llm_manager.model}): [Thinking...]\n"
-        conversation_widget.text += thinking_message
-        conversation_widget.scroll_end(animate=False)
+        conversation_widget.text += f"\n🧑 You: {query}\n\n🤖 AI: [Thinking...]\n"
         
         # Get AI response
         response = await self.llm_manager.query_llm(query)
         
-        # Update conversation: Replace only the last "[Thinking...]"
-        # A simple approach: find the last occurrence of the specific thinking message
-        last_thinking_index = conversation_widget.text.rfind(thinking_message.strip()) # Use strip to match text area content
-        
-        if last_thinking_index != -1:
-            # Calculate the start and end of the placeholder text to replace
-            placeholder_start_index = last_thinking_index
-            # We need to be careful if "[Thinking...]" is part of the actual model name, though unlikely.
-            # The replacement logic relies on replacing the *entire* "🤖 AI (model): [Thinking...]" line.
-            # For robustness, we replace the entire line.
-            
-            # Find the end of the "Thinking..." line
-            end_of_thinking_line = conversation_widget.text.find("\n", placeholder_start_index)
-            if end_of_thinking_line == -1: # If it's the last line
-                end_of_thinking_line = len(conversation_widget.text)
-
-            # Construct the new AI response line
-            new_ai_response_line = f"\n🤖 AI ({self.llm_manager.model}): {response}\n"
-
-            # Replace the placeholder line with the actual response line
-            conversation_widget.text = (
-                conversation_widget.text[:placeholder_start_index] +
-                new_ai_response_line +
-                conversation_widget.text[end_of_thinking_line:]
-            )
-        else: # Fallback if "[Thinking...]" wasn't found (should not happen in normal flow)
-            conversation_widget.text += f"\n🤖 AI ({self.llm_manager.model}): {response}\n" # Append if placeholder not found
-
-        conversation_widget.text += "─" * 50 + "\n"
-        conversation_widget.scroll_end(animate=False)
+        # Update conversation
+        conversation_widget.text = conversation_widget.text.replace("[Thinking...]", response)
+        conversation_widget.text += "\n" + "─" * 50 + "\n"
 
 
 class PluginTab(Container):
@@ -409,29 +407,7 @@ class PluginTab(Container):
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "refresh-plugins":
-            # Call the refresh logic in the manager
-            self.plugin_manager.refresh_plugins()
-            
-            # Get the DataTable widget
-            table = self.query_one(DataTable)
-            
-            # Clear existing rows
-            table.clear()
-            
-            # Re-populate the table
-            for plugin in self.plugin_manager.get_plugins():
-                status_emoji = {
-                    "Installed": "✅",
-                    "Available": "📦", 
-                    "Not Found": "❌"
-                }.get(plugin["status"], "❓")
-                
-                table.add_row(
-                    plugin["name"],
-                    f"{status_emoji} {plugin['status']}",
-                    plugin["description"]
-                )
-            # self.notify("🔄 Plugin refresh would happen here!") # Removed as per requirement
+            self.notify("🔄 Plugin refresh would happen here!")
 
 
 # =============================================================================
@@ -441,48 +417,7 @@ class PluginTab(Container):
 class CTFToolkitApp(App):
     """Main CTF Toolkit TUI Application"""
     
-    CSS_PATH = None  # Using inline CSS for POC
-    CSS = """
-    .tab-header {
-        text-style: bold;
-        background: green;
-        color: white;
-        padding: 1;
-        margin-bottom: 1;
-    }
-    
-    .prompt {
-        color: $accent;
-        text-style: bold;
-        width: 2; 
-    }
-    
-    #terminal-output {
-        /* height: 20; -- Removed for flexible height */
-        background: $surface;
-        border: solid $primary;
-        height: 1fr; /* Allow terminal output to expand */
-        overflow-y: auto; /* Enable vertical scrolling */
-    }
-
-    #terminal-input { /* Added for input field font size */
-        /* font-size: 75%; -- Removed, not a valid Textual CSS property here */
-    }
-    
-    #markdown-editor, #markdown-preview {
-        height: 30;
-    }
-    
-    #ai-conversation {
-        height: 30;
-        background: $surface;
-        border: solid $accent;
-    }
-    
-    Footer {
-        background: $primary;
-    }
-    """
+    CSS_PATH = "ctf_toolkit.css"
     
     BINDINGS = [
         Binding("ctrl+q", "quit", "Quit"),
