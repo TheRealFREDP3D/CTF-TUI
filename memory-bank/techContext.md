@@ -3,6 +3,7 @@
 ## Technologies Used
 - **Framework**: Textual (Python TUI framework)
 - **Language**: Python 3.7+
+- **LLM Abstraction**: LiteLLM for abstracting various LLM APIs.
 - **Async Support**: Full async/await pattern for non-blocking operations, with emphasis on best practices like using worker threads and incremental output streaming.
 - **Process Management**: asyncio subprocess handling for command execution, with a focus on secure input sanitization.
 - **Configuration Management**: Utilizing `pyyaml` for configuration files, with added validation using `jsonschema`. Prioritizing environment variables for sensitive information like API keys.
@@ -31,6 +32,7 @@ pathlib  # Built-in Python 3.4+
 subprocess  # Built-in
 pyyaml # For configuration file handling
 jsonschema # For configuration validation
+litellm # For LLM abstraction
 
 # Future Production Dependencies
 openai  # For OpenAI integration (consider lazy import)
@@ -46,3 +48,4 @@ pytest # For testing
 - Using environment variables for sensitive configuration.
 - Leveraging testing frameworks and logging for development and debugging.
 - Planning to use `PyInstaller` for application distribution.
+- Integrating LiteLLM for unified LLM access.
