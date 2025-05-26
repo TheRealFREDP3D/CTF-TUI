@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Toolkit TUI Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #2d1b69 0%, #1a1a1a 100%);
+        }
+
+        .header {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header .time {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+
+        .tab-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-nav {
+            display: flex;
+            background: #2d2d2d;
+            border-bottom: 2px solid #404040;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #a0a0a0;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: #3d3d3d;
+            color: #e0e0e0;
+        }
+
+        .tab-button.active {
+            background: #1a1a1a;
+            color: #6366f1;
+            border-bottom-color: #6366f1;
+        }
+
+        .tab-content {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            background: #1a1a1a;
+        }
+
+        .tab-pane {
+            display: none;
+            height: 100%;
+        }
+
+        .tab-pane.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-header {
+            background: linear-gradient(90deg, #059669, #10b981);
+            color: white;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+        }
+
+        /* Terminal Styles */
+        .terminal-output {
+            background: #0f0f0f;
+            border: 2px solid #6366f1;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+
+        .terminal-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .prompt {
+            color: #6366f1;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: #e0e0e0;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .terminal-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .execute-btn {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .execute-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Markdown Styles */
+        .markdown-container {
+            display: flex;
+            gap: 20px;
+            height: 400px;
+        }
+
+        .markdown-editor, .markdown-preview {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .markdown-textarea {
+            flex: 1;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            padding: 15px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: none;
+        }
+
+        .markdown-preview-content {
+            flex: 1;
+            background: #0f0f0f;
+            border: 2px solid #8b5cf6;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .markdown-preview-content h1 {
+            color: #8b5cf6;
+            margin-bottom: 10px;
+        }
+
+        .markdown-preview-content p {
+            color: #a0a0a0;
+            font-style: italic;
+        }
+
+        /* AI Assistant Styles */
+        .ai-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .ai-input {
+            flex: 1;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 10px 15px;
+            color: #e0e0e0;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .ai-conversation {
+            background: #0f0f0f;
+            border: 2px solid #8b5cf6;
+            border-radius: 8px;
+            padding: 15px;
+            height: 350px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Tools/Plugin Styles */
+        .tools-table {
+            background: #2d2d2d;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .tools-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tools-table th {
+            background: #404040;
+            color: #e0e0e0;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .tools-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #404040;
+            color: #a0a0a0;
+        }
+
+        .tools-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-installed { color: #10b981; }
+        .status-available { color: #f59e0b; }
+        .status-not-found { color: #ef4444; }
+
+        .refresh-btn {
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .footer {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            padding: 8px 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 12px;
+        }
+
+        .keybind {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 0 5px;
+        }
+
+        .output-line {
+            margin: 2px 0;
+        }
+
+        .stdout { color: #e0e0e0; }
+        .stderr { color: #ef4444; }
+        .command { color: #6366f1; font-weight: bold; }
+        .executing { color: #f59e0b; }
+        .exit-code { color: #10b981; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .executing {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🛡️ CTF Toolkit v0.1.0 - Proof of Concept</h1>
+            <div class="time" id="current-time"></div>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab-nav">
+                <button class="tab-button active" data-tab="terminal">🖥️ Terminal</button>
+                <button class="tab-button" data-tab="notes">📝 Notes</button>
+                <button class="tab-button" data-tab="ai">🤖 AI Assistant</button>
+                <button class="tab-button" data-tab="tools">🔧 Tools</button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Terminal Tab -->
+                <div class="tab-pane active" id="terminal">
+                    <div class="tab-header">🖥️ Terminal</div>
+                    <div class="terminal-output" id="terminal-output">
+                        <div class="output-line">Welcome to CTF Toolkit Terminal!</div>
+                        <div class="output-line">$ <span style="color: #6366f1;">█</span></div>
+                    </div>
+                    <div class="terminal-input-row">
+                        <span class="prompt">$</span>
+                        <input type="text" class="terminal-input" id="terminal-input" placeholder="Enter command...">
+                        <button class="execute-btn" onclick="executeCommand()">Execute</button>
+                    </div>
+                </div>
+
+                <!-- Notes Tab -->
+                <div class="tab-pane" id="notes">
+                    <div class="tab-header">📝 Notes</div>
+                    <div class="markdown-container">
+                        <div class="markdown-editor">
+                            <label style="color: #a0a0a0; margin-bottom: 8px; display: block;">Editor</label>
+                            <textarea class="markdown-textarea" id="markdown-editor" placeholder="Write your markdown here..."># CTF Toolkit Notes
+
+*Start taking notes...*
+
+## Challenge Analysis
+- [ ] Reconnaissance
+- [ ] Vulnerability Assessment
+- [ ] Exploitation
+
+## Useful Commands
+```bash
+nmap -sV target.com
+gobuster dir -u http://target.com -w wordlist.txt
+```</textarea>
+                        </div>
+                        <div class="markdown-preview">
+                            <label style="color: #a0a0a0; margin-bottom: 8px; display: block;">Preview</label>
+                            <div class="markdown-preview-content" id="markdown-preview">
+                                <h1>CTF Toolkit Notes</h1>
+                                <p><em>Start taking notes...</em></p>
+                                <h2>Challenge Analysis</h2>
+                                <ul>
+                                    <li>☐ Reconnaissance</li>
+                                    <li>☐ Vulnerability Assessment</li>
+                                    <li>☐ Exploitation</li>
+                                </ul>
+                                <h2>Useful Commands</h2>
+                                <pre style="background: #2d2d2d; padding: 10px; border-radius: 4px;">nmap -sV target.com
+gobuster dir -u http://target.com -w wordlist.txt</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Assistant Tab -->
+                <div class="tab-pane" id="ai">
+                    <div class="tab-header">🤖 AI Assistant</div>
+                    <div class="ai-input-row">
+                        <input type="text" class="ai-input" id="ai-input" placeholder="Ask the AI about your CTF challenge...">
+                        <button class="execute-btn" onclick="sendAIQuery()">Send</button>
+                    </div>
+                    <div class="ai-conversation" id="ai-conversation">
+                        <div style="color: #8b5cf6; margin-bottom: 10px;">🤖 AI Assistant ready! Ask me about:</div>
+                        <div style="color: #a0a0a0; margin-left: 20px;">
+                            • Cryptography challenges<br>
+                            • Web exploitation techniques<br>
+                            • Binary analysis<br>
+                            • Network forensics<br>
+                            • Reverse engineering<br>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools Tab -->
+                <div class="tab-pane" id="tools">
+                    <div class="tab-header">🔧 Tools & Plugins</div>
+                    <div class="tools-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>CyberChef</td>
+                                    <td><span class="status-available">📦 Available</span></td>
+                                    <td>Data manipulation toolkit</td>
+                                </tr>
+                                <tr>
+                                    <td>John the Ripper</td>
+                                    <td><span class="status-installed">✅ Installed</span></td>
+                                    <td>Password cracking</td>
+                                </tr>
+                                <tr>
+                                    <td>Wireshark</td>
+                                    <td><span class="status-available">📦 Available</span></td>
+                                    <td>Network protocol analyzer</td>
+                                </tr>
+                                <tr>
+                                    <td>Burp Suite</td>
+                                    <td><span class="status-not-found">❌ Not Found</span></td>
+                                    <td>Web app security testing</td>
+                                </tr>
+                                <tr>
+                                    <td>Ghidra</td>
+                                    <td><span class="status-installed">✅ Installed</span></td>
+                                    <td>Reverse engineering suite</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="refresh-btn" onclick="refreshPlugins()">Refresh Plugins</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="keybind">Ctrl+Q</span>Quit
+            <span class="keybind">Ctrl+T</span>Terminal
+            <span class="keybind">Ctrl+M</span>Notes
+            <span class="keybind">Ctrl+A</span>AI
+            <span class="keybind">Ctrl+P</span>Tools
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+                
+                // Update button states
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Update tab panes
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString();
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Terminal functionality
+        let commandHistory = [];
+        
+        function executeCommand() {
+            const input = document.getElementById('terminal-input');
+            const output = document.getElementById('terminal-output');
+            const command = input.value.trim();
+            
+            if (!command) return;
+            
+            // Add command to history
+            commandHistory.push(command);
+            
+            // Add command to output
+            const commandLine = document.createElement('div');
+            commandLine.className = 'output-line command';
+            commandLine.textContent = `$ ${command}`;
+            output.appendChild(commandLine);
+            
+            // Show executing
+            const executingLine = document.createElement('div');
+            executingLine.className = 'output-line executing';
+            executingLine.textContent = '[Executing...]';
+            output.appendChild(executingLine);
+            
+            // Clear input
+            input.value = '';
+            
+            // Simulate command execution
+            setTimeout(() => {
+                executingLine.remove();
+                
+                // Simulate different command outputs
+                if (command.includes('ls')) {
+                    addOutput('README.md    challenge.txt    exploit.py    notes.md', 'stdout');
+                } else if (command.includes('cat')) {
+                    addOutput('This is a simulated file content for the CTF toolkit demo.', 'stdout');
+                } else if (command.includes('nmap')) {
+                    addOutput('Starting Nmap scan...', 'stdout');
+                    addOutput('Host is up (0.023s latency)', 'stdout');
+                    addOutput('PORT     STATE SERVICE', 'stdout');
+                    addOutput('22/tcp   open  ssh', 'stdout');
+                    addOutput('80/tcp   open  http', 'stdout');
+                } else if (command.includes('whoami')) {
+                    addOutput('ctf-player', 'stdout');
+                } else if (command.includes('pwd')) {
+                    addOutput('/home/ctf-player/challenges', 'stdout');
+                } else {
+                    addOutput(`Command '${command}' not found or not implemented in demo`, 'stderr');
+                }
+                
+                addOutput('[Exit Code: 0]', 'exit-code');
+                output.scrollTop = output.scrollHeight;
+            }, 1000 + Math.random() * 1000);
+        }
+        
+        function addOutput(text, type) {
+            const output = document.getElementById('terminal-output');
+            const line = document.createElement('div');
+            line.className = `output-line ${type}`;
+            line.textContent = text;
+            output.appendChild(line);
+        }
+        
+        // Enter key support for terminal
+        document.getElementById('terminal-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                executeCommand();
+            }
+        });
+
+        // AI Assistant functionality
+        function sendAIQuery() {
+            const input = document.getElementById('ai-input');
+            const conversation = document.getElementById('ai-conversation');
+            const query = input.value.trim();
+            
+            if (!query) return;
+            
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.innerHTML = `<br>🧑 <strong>You:</strong> ${query}<br>`;
+            conversation.appendChild(userMsg);
+            
+            // Add thinking message
+            const thinkingMsg = document.createElement('div');
+            thinkingMsg.innerHTML = `<br>🤖 <strong>AI:</strong> <span class="executing">[Thinking...]</span><br>`;
+            conversation.appendChild(thinkingMsg);
+            
+            // Clear input
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const responses = [
+                    "For cryptography challenges, try analyzing the cipher type first. Common types include Caesar, Vigenère, and RSA.",
+                    "Web exploitation often involves SQL injection, XSS, or directory traversal. Check for input validation issues.",
+                    "For binary analysis, start with `file` and `strings` commands to understand the binary structure.",
+                    "Network forensics requires packet analysis. Look for unusual traffic patterns or unencrypted data.",
+                    "Reverse engineering benefits from tools like Ghidra or IDA. Start by analyzing the main function."
+                ];
+                
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                thinkingMsg.innerHTML = `<br>🤖 <strong>AI:</strong> ${response}<br>`;
+                
+                // Add separator
+                const separator = document.createElement('div');
+                separator.innerHTML = '<br>' + '─'.repeat(50) + '<br>';
+                separator.style.color = '#404040';
+                conversation.appendChild(separator);
+                
+                conversation.scrollTop = conversation.scrollHeight;
+            }, 1500 + Math.random() * 1000);
+        }
+        
+        // Enter key support for AI input
+        document.getElementById('ai-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendAIQuery();
+            }
+        });
+
+        // Markdown live preview
+        document.getElementById('markdown-editor').addEventListener('input', (e) => {
+            const preview = document.getElementById('markdown-preview');
+            const text = e.target.value;
+            
+            // Simple markdown rendering (basic implementation for demo)
+            let html = text
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*)\*/gim, '<em>$1</em>')
+                .replace(/^- \[ \] (.*$)/gim, '<li>☐ $1</li>')
+                .replace(/^- \[x\] (.*$)/gim, '<li>☑ $1</li>')
+                .replace(/^- (.*$)/gim, '<li>$1</li>')
+                .replace(/```([\s\S]*?)```/gim, '<pre style="background: #2d2d2d; padding: 10px; border-radius: 4px;">$1</pre>')
+                .replace(/\n/gim, '<br>');
+            
+            preview.innerHTML = html;
+        });
+
+        // Plugin refresh functionality
+        function refreshPlugins() {
+            // Simulate plugin refresh
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = '🔄 Refreshing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+                
+                // Show notification (simple alert for demo)
+                alert('🔄 Plugins refreshed! In a real implementation, this would check for newly installed tools.');
+            }, 2000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case 't':
+                        e.preventDefault();
+                        document.querySelector('[data-tab="terminal"]').click();
+                        break;
+                    case 'm':
+                        e.preventDefault();
+                        document.querySelector('[data-tab="notes"]').click();
+                        break;
+                    case 'a':
+                        e.preventDefault();
+                        document.querySelector('[data-tab="ai"]').click();
+                        break;
+                    case 'p':
+                        e.preventDefault();
+                        document.querySelector('[data-tab="tools"]').click();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
