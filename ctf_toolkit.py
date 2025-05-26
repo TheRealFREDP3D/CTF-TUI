@@ -11,7 +11,7 @@ load_dotenv()
 import asyncio
 import subprocess
 from datetime import datetime
-from typing import Optional
+from typing import Optional, AsyncGenerator, Tuple, Any
 from pathlib import Path
 
 from textual.app import App, ComposeResult
@@ -37,8 +37,8 @@ class TerminalManager:
         self.history = []
         self.current_dir = Path.cwd()
     
-    async def execute_command(self, command: str) -> tuple[str, str, int]:
-        """Execute a command and return (stdout, stderr, return_code)"""
+    async def execute_command(self, command: str) -> AsyncGenerator[Tuple[str, Any], None]:
+        """Execute a command and yield output incrementally"""
         try:
             # Add to history
             self.history.append({
@@ -54,15 +54,50 @@ class TerminalManager:
                 stderr=asyncio.subprocess.PIPE,
                 cwd=str(self.current_dir)
             )
-            
-            stdout, stderr = await process.communicate()
-            return (
-                stdout.decode('utf-8', errors='replace'),
-                stderr.decode('utf-8', errors='replace'),
-                process.returncode or 0
-            )
+
+            if process.stdout is None or process.stderr is None:
+                raise RuntimeError("Failed to get stdout/stderr streams from subprocess.")
+
+            stdout_queue: asyncio.Queue[str] = asyncio.Queue()
+            stderr_queue: asyncio.Queue[str] = asyncio.Queue()
+
+            stdout_task = asyncio.create_task(self._enqueue_stream(process.stdout, stdout_queue))
+            stderr_task = asyncio.create_task(self._enqueue_stream(process.stderr, stderr_queue))
+
+            # Continuously yield output as it becomes available
+            while True:
+                stdout_done = stdout_task.done()
+                stderr_done = stderr_task.done()
+                stdout_empty = stdout_queue.empty()
+                stderr_empty = stderr_queue.empty()
+
+                if stdout_done and stderr_done and stdout_empty and stderr_empty:
+                    break # All tasks finished and queues are empty
+
+                if not stdout_empty:
+                    yield ('stdout', await stdout_queue.get())
+                if not stderr_empty:
+                    yield ('stderr', await stderr_queue.get())
+                
+                # If both queues are empty but tasks are not done, wait a bit
+                if stdout_empty and stderr_empty and (not stdout_done or not stderr_done):
+                    await asyncio.sleep(0.001) # Small sleep to prevent busy waiting
+
+            await asyncio.gather(stdout_task, stderr_task) # Ensure stream reading tasks are truly complete
+            await process.wait() # Wait for the process to finish
+            yield ('returncode', process.returncode or 0)
+
         except Exception as e:
-            return "", f"Error: {str(e)}", 1
+            yield ('error', str(e))
+            yield ('returncode', 1)
+
+    async def _enqueue_stream(self, stream: asyncio.StreamReader, queue: asyncio.Queue[str]):
+        """Helper to read from a stream and put lines into a queue"""
+        while True:
+            line = await stream.readline()
+            if not line:
+                break
+            await queue.put(line.decode('utf-8', errors='replace'))
 
 
 class MarkdownManager:
@@ -173,18 +208,20 @@ class TerminalTab(Container):
         output_widget.text += f"\n$ {command}\n[Executing...]\n"
         output_widget.scroll_end(animate=False) # Auto-scroll
         
-        # Execute command
-        stdout, stderr, return_code = await self.terminal_manager.execute_command(command)
-        
-        # Update output
-        result = ""
-        if stdout:
-            result += stdout
-        if stderr:
-            result += f"[STDERR]\n{stderr}\n"
-        result += f"[Exit Code: {return_code}]\n"
-        
-        output_widget.text += result + "\n"
+        # Execute command and process output incrementally
+        return_code = 1 # Default to error
+        async for stream_type, value in self.terminal_manager.execute_command(command):
+            if stream_type == 'stdout':
+                output_widget.text += value
+            elif stream_type == 'stderr':
+                output_widget.text += f"[STDERR] {value}"
+            elif stream_type == 'error':
+                output_widget.text += f"[ERROR] {value}\n"
+            elif stream_type == 'returncode':
+                return_code = value
+            output_widget.scroll_end(animate=False) # Auto-scroll
+
+        output_widget.text += f"[Exit Code: {return_code}]\n"
         output_widget.scroll_end(animate=False) # Auto-scroll
 
 
@@ -326,18 +363,15 @@ class CTFToolkitApp(App):
     .prompt {
         color: $accent;
         text-style: bold;
-        width: 2;
-        /* font-size: 75%; -- Removed, not a valid Textual CSS property here */
+        width: 2; 
     }
     
     #terminal-output {
         /* height: 20; -- Removed for flexible height */
         background: $surface;
         border: solid $primary;
-        /* font-size: 75%; -- Removed, not a valid Textual CSS property here */
-        /* Textual's default layout should allow it to expand.
-           If issues, consider adding 'height: 1fr;' if TerminalTab uses a vertical layout
-           and this is the primary expanding widget. */
+        height: 1fr; /* Allow terminal output to expand */
+        overflow-y: auto; /* Enable vertical scrolling */
     }
 
     #terminal-input { /* Added for input field font size */
@@ -345,11 +379,11 @@ class CTFToolkitApp(App):
     }
     
     #markdown-editor, #markdown-preview {
-        height: 20;
+        height: 30;
     }
     
     #ai-conversation {
-        height: 15;
+        height: 30;
         background: $surface;
         border: solid $accent;
     }
