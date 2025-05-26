@@ -189,5 +189,8 @@ cython_debug/
 /.venv
 /.vscode
 /appmap.log
+<<<<<<< HEAD
 =0.40.0
+=======
+>>>>>>> 5960ee4 (	modified:   .gitignore)
 feat_ Integrate LiteLLM for AI assistant by TheRealFREDP3D · Pull Request #1 · TheRealFREDP3D_CTF-TUI.pdf
