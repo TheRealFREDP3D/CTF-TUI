@@ -1,1 +1,16 @@
-/* CSS content from the 'CSS' class attribute within 'CTFToolkitApp' */
+TerminalTab {
+    layout: vertical; /* Ensure vertical layout */
+}
+
+#terminal-output {
+    height: 1fr; /* Make TextArea take all available vertical space */
+}
+
+#terminal-input-container {
+    height: auto; /* Allow input container to take only necessary height */
+    padding: 0 1; /* Add some horizontal padding */
+}
+
+#terminal-input {
+    width: 1fr; /* Make input take all available horizontal space */
+}
