@@ -247,9 +247,8 @@ class TerminalTab(Container):
     
     def compose(self) -> ComposeResult:
         yield Static("🖥️  Terminal", classes="tab-header")
-        yield TextArea("Welcome to CTF Toolkit Terminal!\n$ ", id="terminal-output", read_only=True)
+        yield TextArea("Welcome to CTF Toolkit Terminal!\n", id="terminal-output", read_only=True)
         with Horizontal(id="terminal-input-container"):
-            yield Static("$ ", classes="prompt")
             yield Input(placeholder="Enter command...", id="terminal-input")
             yield Button("Execute", id="terminal-execute", variant="primary")
     
@@ -272,7 +271,7 @@ class TerminalTab(Container):
         
         # Clear input and show executing
         input_widget.value = ""
-        output_widget.text += f"\n$ {command}\n[Executing...]\n"
+        output_widget.text += f"\n{command}\n[Executing...]\n"
         output_widget.scroll_end(animate=False) # Auto-scroll
         
         # Execute command and process output incrementally

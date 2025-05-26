@@ -5,9 +5,13 @@
 The CTF Toolkit provides an integrated environment combining terminal operations, note-taking, AI assistance, and tool management in a single, efficient interface. Built with Python's Textual framework, it aims to enhance productivity for CTF players, security researchers, and penetration testers.
 
 ## Key Features
-
+  
+![Terminal Tab](docs/Terminal-Tab.jpg)  
+  
 *   **Integrated Terminal:** Execute system commands directly within the application, with history and working directory management.
-*   **Markdown Notes:** Take and manage notes using a live markdown editor with real-time preview.
+*   **Markdown Notes:** Take and manage notes using a live markdown editor with real-time preview.  
+  
+![Note Tab](docs/Note-Markdown-Preview-Tab.jpg)  
 *   **AI Assistant:** Leverage AI (multiple LLM providers planned) for context-aware assistance during challenges.
 *   **Plugin Management:** Discover, track, and manage external CTF tools and utilities.
 *   **Keyboard-Driven Interface:** Navigate and operate the toolkit efficiently using keyboard shortcuts.
