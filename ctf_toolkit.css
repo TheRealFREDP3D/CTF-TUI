@@ -1,16 +1,82 @@
+/* CTF Toolkit Styles */
+
+/* General tab styling */
+.tab-header {
+    height: 3;
+    content-align: center middle;
+    background: $primary;
+    color: $text;
+    text-style: bold;
+}
+
+/* AI Tab specific styling */
+AITab {
+    layout: vertical;
+}
+
+#ai-output {
+    height: 1fr;  /* Take up all available space */
+    margin-bottom: 1;
+}
+
+#ai-input-container {
+    height: 3;
+    dock: bottom;
+    width: 100%;
+}
+
+#ai-input {
+    width: 1fr;  /* Take up most of the horizontal space */
+}
+
+#ai-send {
+    width: auto;
+    margin-left: 1;
+}
+
+/* Terminal Tab styling */
 TerminalTab {
-    layout: vertical; /* Ensure vertical layout */
+    layout: vertical;
 }
 
 #terminal-output {
-    height: 1fr; /* Make TextArea take all available vertical space */
+    height: 1fr;
+    margin-bottom: 1;
 }
 
 #terminal-input-container {
-    height: auto; /* Allow input container to take only necessary height */
-    padding: 0 1; /* Add some horizontal padding */
+    height: 3;
+    dock: bottom;
+    width: 100%;
 }
 
 #terminal-input {
-    width: 1fr; /* Make input take all available horizontal space */
+    width: 1fr;
+}
+
+#terminal-execute {
+    width: auto;
+    margin-left: 1;
+}
+
+/* Plugin table styling */
+DataTable {
+    height: 1fr;
+}
+
+/* Markdown editor styling */
+MarkdownTab Horizontal {
+    height: 1fr;
+}
+
+MarkdownTab Vertical {
+    width: 1fr;
+}
+
+#markdown-editor {
+    height: 1fr;
+}
+
+#markdown-preview {
+    height: 1fr;
 }

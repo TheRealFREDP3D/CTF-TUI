@@ -4,11 +4,9 @@ import sys
 
 # ASCII art title
 TITLE = r"""
- ▄▄· ▄▄▄▄▄·▄▄▄▄▄▄▄▄            ▄▄▌  ▄ •▄ ▪  ▄▄▄▄▄
-▐█ ▌▪•██  ▐▄▄·•██  ▪     ▪     ██•  █▌▄▌▪██ •██  
-██ ▄▄ ▐█.▪██▪  ▐█.▪ ▄█▀▄  ▄█▀▄ ██▪  ▐▀▀▄·▐█· ▐█.▪
-▐███▌ ▐█▌·██▌. ▐█▌·▐█▌.▐▌▐█▌.▐▌▐█▌▐▌▐█.█▌▐█▌ ▐█▌·
-·▀▀▀  ▀▀▀ ▀▀▀  ▀▀▀  ▀█▄▀▪ ▀█▄▀▪.▀▀▀ ·▀  ▀▀▀▀ ▀▀▀  
+░█▀▀░▀█▀░█▀▀░░░░░▀█▀░█▀█░█▀█░█░░░█░█░▀█▀░▀█▀
+░█░░░░█░░█▀▀░▄▄▄░░█░░█░█░█░█░█░░░█▀▄░░█░░░█░
+░▀▀▀░░▀░░▀░░░░░░░░▀░░▀▀▀░▀▀▀░▀▀▀░▀░▀░▀▀▀░░▀░
 """
 
 # Clear screen
@@ -17,6 +15,13 @@ def clear():
 
 # Flashing text animation
 def flash_title(times=6, interval=0.3):
+    for i in range(times):
+        clear()
+        if i % 2 == 0:
+            print("\033[92m" + TITLE + "\033[0m")  # Green text
+        else:
+            print("\033[91m" + TITLE + "\033[0m")  # Red text
+        time.sleep(interval)
     for i in range(times):
         clear()
         if i % 2 == 0:
@@ -43,7 +48,7 @@ def main_screen():
     print(TITLE)
     print("\033[0m")
     print("Welcome to the CTF-TOOLKIT!")
-    print("Available Modules:")
+    print("Available Modules:\n\n")
     print(" - Terminal")
     print(" - Markdown Notes")
     print(" - AI Assistant")
