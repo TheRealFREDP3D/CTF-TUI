@@ -46,7 +46,6 @@ def main_screen():
     print(" - Terminal")
     print(" - Markdown Notes")
     print(" - AI Assistant")
-    print(" - Plugin Management")
     print("\n\nTo start, run: python ctf_toolkit.py\n")
 
 # Main execution
