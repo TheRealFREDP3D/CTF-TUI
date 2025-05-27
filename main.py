@@ -4,11 +4,9 @@ import sys
 
 # ASCII art title
 TITLE = r"""
- ▄▄· ▄▄▄▄▄·▄▄▄▄▄▄▄▄            ▄▄▌  ▄ •▄ ▪  ▄▄▄▄▄
-▐█ ▌▪•██  ▐▄▄·•██  ▪     ▪     ██•  █▌▄▌▪██ •██  
-██ ▄▄ ▐█.▪██▪  ▐█.▪ ▄█▀▄  ▄█▀▄ ██▪  ▐▀▀▄·▐█· ▐█.▪
-▐███▌ ▐█▌·██▌. ▐█▌·▐█▌.▐▌▐█▌.▐▌▐█▌▐▌▐█.█▌▐█▌ ▐█▌·
-·▀▀▀  ▀▀▀ ▀▀▀  ▀▀▀  ▀█▄▀▪ ▀█▄▀▪.▀▀▀ ·▀  ▀▀▀▀ ▀▀▀  
+░█▀▀░▀█▀░█▀▀░░░░░▀█▀░█▀█░█▀█░█░░░█░█░▀█▀░▀█▀
+░█░░░░█░░█▀▀░▄▄▄░░█░░█░█░█░█░█░░░█▀▄░░█░░░█░
+░▀▀▀░░▀░░▀░░░░░░░░▀░░▀▀▀░▀▀▀░▀▀▀░▀░▀░▀▀▀░░▀░
 """
 
 # Clear screen
@@ -24,6 +22,7 @@ def flash_title(times=6, interval=0.3):
         else:
             print("\033[91m" + TITLE + "\033[0m")  # Red text
         time.sleep(interval)
+    clear()
 
 # Loading bar animation
 def loading_bar(duration=5, length=50):
@@ -43,7 +42,7 @@ def main_screen():
     print(TITLE)
     print("\033[0m")
     print("Welcome to the CTF-TOOLKIT!")
-    print("Available Modules:")
+    print("Available Modules:\n\n")
     print(" - Terminal")
     print(" - Markdown Notes")
     print(" - AI Assistant")

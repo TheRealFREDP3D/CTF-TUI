@@ -321,58 +321,47 @@ class MarkdownTab(Container):
             preview.update(event.text_area.text)
 
 
+from textual.containers import Vertical  # Add this if not imported
+
 class AITab(Container):
-    """AI assistant tab for LLM integration"""
-    
+    """AI assistant tab that mimics terminal layout"""
+
     def __init__(self):
         super().__init__()
         self.llm_manager = LLMManager()
-    
+
     def compose(self) -> ComposeResult:
         yield Static("🤖 AI Assistant", classes="tab-header")
-        
-        # Removed provider selection as LiteLLM handles this via config
-        # with Horizontal():
-        #     yield Label("Provider:")
-        #     yield Select(
-        #         [(provider, provider) for provider in self.llm_manager.providers],
-        #         value=self.llm_manager.current_provider,
-        #         id="llm-provider"
-        #     )
-        
-        with Horizontal():
-            yield Input(placeholder="Ask the AI about your CTF challenge...", id="ai-input")
+        yield TextArea("Welcome to the AI Assistant!\n", id="ai-output", read_only=True)
+        with Horizontal(id="ai-input-container"):
+            yield Input(placeholder="Ask a question...", id="ai-input")
             yield Button("Send", id="ai-send", variant="primary")
 
-        yield TextArea("", id="ai-conversation", read_only=True)
-    
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "ai-send":
-            await self.send_ai_query()
-    
+            await self.send_prompt()
+
     async def on_input_submitted(self, event: Input.Submitted) -> None:
         if event.input.id == "ai-input":
-            await self.send_ai_query()
-    
-    async def send_ai_query(self):
-        """Send query to AI and display response"""
+            await self.send_prompt()
+
+    async def send_prompt(self):
         input_widget = self.query_one("#ai-input", Input)
-        conversation_widget = self.query_one("#ai-conversation", TextArea)
-        
-        query = input_widget.value.strip()
-        if not query:
+        output_widget = self.query_one("#ai-output", TextArea)
+
+        prompt = input_widget.value.strip()
+        if not prompt:
             return
-        
-        # Clear input and show thinking
+
         input_widget.value = ""
-        conversation_widget.text += f"\n🧑 You: {query}\n\n🤖 AI: [Thinking...]\n"
-        
-        # Get AI response
-        response = await self.llm_manager.query_llm(query)
-        
-        # Update conversation
-        conversation_widget.text = conversation_widget.text.replace("[Thinking...]", response)
-        conversation_widget.text += "\n" + "─" * 50 + "\n"
+        output_widget.text += f"\n> {prompt}\n[Thinking...]\n"
+        output_widget.scroll_end(animate=False)
+
+        response = await self.llm_manager.query_llm(prompt)
+
+        output_widget.text += f"{response}\n"
+        output_widget.scroll_end(animate=False)
+
 
 
 class PluginTab(Container):
