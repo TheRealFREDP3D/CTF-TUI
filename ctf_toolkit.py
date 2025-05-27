@@ -217,23 +217,6 @@ class LLMManager:
             return f"⚠️ LLM error: {e}"
 
 
-class PluginManager:
-    """Handles plugin discovery and management"""
-    
-    def __init__(self):
-        self.plugins = [
-            {"name": "CyberChef", "status": "Available", "description": "Data manipulation toolkit"},
-            {"name": "John the Ripper", "status": "Installed", "description": "Password cracking"},
-            {"name": "Wireshark", "status": "Available", "description": "Network protocol analyzer"},
-            {"name": "Burp Suite", "status": "Not Found", "description": "Web app security testing"},
-            {"name": "Ghidra", "status": "Installed", "description": "Reverse engineering suite"},
-        ]
-    
-    def get_plugins(self):
-        """Get list of available plugins"""
-        return self.plugins
-
-
 # =============================================================================
 # UI COMPONENTS - Individual Tab Implementations
 # =============================================================================
@@ -363,41 +346,6 @@ class AITab(Container):
         output_widget.scroll_end(animate=False)
 
 
-
-class PluginTab(Container):
-    """Plugin management tab"""
-    
-    def __init__(self):
-        super().__init__()
-        self.plugin_manager = PluginManager()
-    
-    def compose(self) -> ComposeResult:
-        yield Static("🔧 Tools & Plugins", classes="tab-header")
-        
-        table = DataTable()
-        table.add_columns("Tool", "Status", "Description")
-        
-        for plugin in self.plugin_manager.get_plugins():
-            status_emoji = {
-                "Installed": "✅",
-                "Available": "📦", 
-                "Not Found": "❌"
-            }.get(plugin["status"], "❓")
-            
-            table.add_row(
-                plugin["name"],
-                f"{status_emoji} {plugin['status']}",
-                plugin["description"]
-            )
-        
-        yield table
-        yield Button("Refresh Plugins", id="refresh-plugins", variant="success")
-    
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "refresh-plugins":
-            self.notify("🔄 Plugin refresh would happen here!")
-
-
 # =============================================================================
 # MAIN APPLICATION
 # =============================================================================
@@ -412,7 +360,6 @@ class CTFToolkitApp(App):
         Binding("ctrl+t", "focus_terminal", "Terminal"),
         Binding("ctrl+m", "focus_markdown", "Notes"),
         Binding("ctrl+a", "focus_ai", "AI"),
-        Binding("ctrl+p", "focus_plugins", "Tools"),
     ]
     
     def compose(self) -> ComposeResult:
@@ -425,8 +372,6 @@ class CTFToolkitApp(App):
                 yield MarkdownTab()
             with TabPane("AI Assistant", id="ai-tab"):
                 yield AITab()
-            with TabPane("Tools", id="plugin-tab"):
-                yield PluginTab()
         
         yield Footer()
     
@@ -444,11 +389,6 @@ class CTFToolkitApp(App):
         """Focus the AI tab"""
         tabs = self.query_one("#main-tabs", TabbedContent)
         tabs.active = "ai-tab"
-    
-    def action_focus_plugins(self) -> None:
-        """Focus the plugins tab"""
-        tabs = self.query_one("#main-tabs", TabbedContent)
-        tabs.active = "plugin-tab"
     
     def on_mount(self) -> None:
         """Called when app starts"""
