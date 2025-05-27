@@ -22,13 +22,7 @@ def flash_title(times=6, interval=0.3):
         else:
             print("\033[91m" + TITLE + "\033[0m")  # Red text
         time.sleep(interval)
-    for i in range(times):
-        clear()
-        if i % 2 == 0:
-            print("\033[92m" + TITLE + "\033[0m")  # Green text
-        else:
-            print("\033[91m" + TITLE + "\033[0m")  # Red text
-        time.sleep(interval)
+    clear()
 
 # Loading bar animation
 def loading_bar(duration=5, length=50):
