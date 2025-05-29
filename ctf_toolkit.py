@@ -32,6 +32,8 @@ from textual.message import Message
 from litellm import acompletion
 import os
 
+from crewai_manager import CrewAIManager # Added import
+
 # =============================================================================
 # MANAGERS - Business Logic Layer
 # =============================================================================
@@ -187,9 +189,9 @@ class LLMManager:
     
     def __init__(self):
         self.conversation_history = []
-        # Read model from environment variable
-        model_env = os.getenv("LITELLM_MODEL", "gpt-4")
-        self.model = model_env # Store the full model name, e.g., "ollama/mistral" or "gpt-4"
+        # Read model from environment variable, default to gemini/gemini-pro
+        model_env = os.getenv("LITELLM_MODEL", "gemini/gemini-pro")
+        self.model = model_env # Store the full model name
     
     async def query_llm(self, prompt: str, context: str = "") -> str:
         """Query the LLM via LiteLLM"""
@@ -303,6 +305,57 @@ class MarkdownTab(Container):
             preview = self.query_one("#markdown-preview", Markdown)
             preview.update(event.text_area.text)
 
+class SuperAgentTab(Container):
+    """Super Agent tab for CrewAI integration"""
+
+    def __init__(self):
+        super().__init__()
+        self.crew_manager = CrewAIManager()
+
+    def compose(self) -> ComposeResult:
+        yield Static("🤖 Super Agent", classes="tab-header")
+        yield TextArea(
+            "Welcome to the Super Agent! Click 'Generate Plan' to use your notes to create a CTF plan.\n",
+            id="superagent-output",
+            read_only=True
+        )
+        yield Button("Generate Plan", id="superagent-generate", variant="primary")
+
+    async def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "superagent-generate":
+            output_widget = self.query_one("#superagent-output", TextArea)
+            output_widget.text = "Generating plan...\n"
+            output_widget.scroll_end(animate=False)
+
+            try:
+                # Access MarkdownManager via the app's query method
+                # This assumes the MarkdownTab has an id 'markdown-tab-container' or similar if it's not the direct child
+                # For this example, we'll assume MarkdownTab is directly queryable.
+                # If MarkdownTab is within TabbedContent, we might need a more specific query.
+                markdown_tab = self.app.query_one(MarkdownTab) # This queries for an instance of MarkdownTab
+                notes_content = markdown_tab.markdown_manager.get_rendered_content()
+                
+                output_widget.text += f"Using notes:\n---\n{notes_content[:200]}...\n---\n" # Display first 200 chars of notes
+                output_widget.scroll_end(animate=False)
+
+                # Setup the crew with the notes content
+                # This part is synchronous and should be quick
+                self.crew_manager.setup_crew(notes_content)
+                output_widget.text += "Crew setup complete. Starting kickoff...\n"
+                output_widget.scroll_end(animate=False)
+                
+                # CrewAI's kickoff is blocking, so run it in a thread
+                # to avoid freezing the Textual UI.
+                plan = await self.app.run_in_thread(self.crew_manager.run_crew)
+                
+                output_widget.text += "\n--- Generated Plan ---\n"
+                output_widget.text += plan
+                output_widget.text += "\n\nPlan generation complete."
+            except Exception as e:
+                output_widget.text += f"\nError generating plan: {e}"
+            
+            output_widget.scroll_end(animate=False)
+
 
 from textual.containers import Vertical  # Add this if not imported
 
@@ -360,6 +413,7 @@ class CTFToolkitApp(App):
         Binding("ctrl+t", "focus_terminal", "Terminal"),
         Binding("ctrl+m", "focus_markdown", "Notes"),
         Binding("ctrl+a", "focus_ai", "AI"),
+        Binding("ctrl+s", "focus_super_agent", "Super Agent"), # Added binding
     ]
     
     def compose(self) -> ComposeResult:
@@ -368,10 +422,12 @@ class CTFToolkitApp(App):
         with TabbedContent(id="main-tabs"):
             with TabPane("Terminal", id="terminal-tab"):
                 yield TerminalTab()
-            with TabPane("Notes", id="markdown-tab"):
+            with TabPane("Notes", id="markdown-tab"): # Ensure MarkdownTab has an accessible ID or way to query
                 yield MarkdownTab()
             with TabPane("AI Assistant", id="ai-tab"):
                 yield AITab()
+            with TabPane("Super Agent", id="superagent-tab"): # Added SuperAgentTab
+                yield SuperAgentTab()
         
         yield Footer()
     
@@ -389,6 +445,11 @@ class CTFToolkitApp(App):
         """Focus the AI tab"""
         tabs = self.query_one("#main-tabs", TabbedContent)
         tabs.active = "ai-tab"
+
+    def action_focus_super_agent(self) -> None: # Added action
+        """Focus the Super Agent tab"""
+        tabs = self.query_one("#main-tabs", TabbedContent)
+        tabs.active = "superagent-tab"
     
     def on_mount(self) -> None:
         """Called when app starts"""
