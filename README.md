@@ -10,11 +10,11 @@ The CTF Toolkit provides an integrated environment combining terminal operations
   
 *   **Integrated Terminal:** Execute system commands directly within the application, with history and working directory management.
     
-![Markdown Tab](docs/Note-Markdown-Preview-Tab.jpg)  
+![Markdown Tab](docs/Notes-Tab.jpg)  
   
 *   **Markdown Notes:** Take and manage notes using a live markdown editor with real-time preview.  
   
-![AI Assistant](docs/AI-Tab.jpg)  
+![AI Assistant](docs/AI-Assistant.jpg)  
   
 *   **AI Assistant:** Leverage AI (multiple LLM providers planned) for context-aware assistance during challenges.
 *   **Plugin Management:** Discover, track, and manage external CTF tools and utilities.
