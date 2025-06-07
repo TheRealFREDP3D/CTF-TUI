@@ -16,8 +16,7 @@ The CTF Toolkit provides an integrated environment combining terminal operations
   
 ![AI Assistant](docs/AI-Assistant.jpg)  
   
-*   **AI Assistant:** Leverage AI (multiple LLM providers planned) for context-aware assistance during challenges.
-*   **Plugin Management:** Discover, track, and manage external CTF tools and utilities.
+*   **AI Assistant:** Leverage AI for context-aware assistance during challenges, supporting various LLM providers (e.g., OpenAI, Ollama) via `litellm` and environment variable configuration.
 *   **Keyboard-Driven Interface:** Navigate and operate the toolkit efficiently using keyboard shortcuts.
 
 ## Technology Stack
@@ -32,7 +31,13 @@ The CTF Toolkit provides an integrated environment combining terminal operations
 
 For now, to run the application, you would typically execute the main Python script:
 ```bash
-python ctf_toolkit.py
+python main.py
+```
+Before running, ensure you have a `.env` file configured for the AI Assistant, for example:
+```
+LITELLM_MODEL="ollama/llama3"
+# Or for OpenAI:
+# OPENAI_API_KEY="your_openai_api_key"
 ```
 
 ## Usage - Key Bindings
@@ -43,7 +48,6 @@ python ctf_toolkit.py
 | `Ctrl+T` | Focus Terminal tab           |
 | `Ctrl+M` | Focus Markdown/Notes tab     |
 | `Ctrl+A` | Focus AI Assistant tab       |
-| `Ctrl+P` | Focus Plugins/Tools tab      |
 
 ## Development Status: Proof of Concept
 
@@ -52,13 +56,10 @@ This project is currently in the **Proof of Concept (PoC)** stage. Core function
 **Current Implemented Features:**
 *   Functional terminal command execution
 *   Live markdown editing and preview
-*   Mock AI assistant responses
-*   Plugin status display (for predefined tools)
 *   Keyboard navigation
 
 **Roadmap / Production Readiness Requirements:**
 *   Full integration with LLM APIs (OpenAI, Anthropic, OpenRouter, Local Ollama)
-*   Plugin auto-discovery, installation, and execution capabilities
 *   Configuration file management for user settings and API keys
 *   Persistent session data (notes, command history, AI conversations)
 *   Enhanced error handling, logging, and stability
@@ -84,17 +85,19 @@ The application is structured around a Manager-Component architecture:
 ## Dependencies
 
 *   `textual>=0.40.0`
+*   `python-dotenv`
+*   `litellm`
 *   Python 3.7+ (with built-in `asyncio`, `pathlib`, `subprocess`)
 
 Future dependencies will include libraries for specific LLM providers (`openai`, `anthropic`), API calls (`requests`), and configuration (`pyyaml`).
 
 ## Contributing
 
-*(Contribution guidelines will be established as the project progresses. We welcome contributions in the future!)*
+We welcome contributions to the CTF Toolkit! As the project matures, detailed contribution guidelines will be provided. In the meantime, feel free to open issues for bug reports or feature requests, and submit pull requests with your improvements.
 
 ## License
 
-*(A license will be chosen and added as the project matures.)*
+This project is currently in its Proof of Concept stage, and a specific open-source license will be chosen and added as the project matures.
 
 ---
 
