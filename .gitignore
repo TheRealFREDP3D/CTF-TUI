@@ -196,3 +196,7 @@ cython_debug/
 feat_ Integrate LiteLLM for AI assistant by TheRealFREDP3D · Pull Request #1 · TheRealFREDP3D_CTF-TUI.pdf
 /_WIP
 .roo/mcp.json
+.cursorrules
+v0.5-PLAN-AI-Assistant.md
+TODO..md
+v5.1-Step-1-Audit-the-Codebase.md

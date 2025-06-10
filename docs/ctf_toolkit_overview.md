@@ -71,6 +71,8 @@ The application follows a **Manager-Component** architecture pattern:
 - Burp Suite (Web security testing)
 - Ghidra (Reverse engineering)
 
+> **Note:** Mock/demo AI assistant responses are now only present in demo files within the `demo/` directory. The main application uses real LLM integration for AI responses.
+
 ## User Interface Components
 
 ### Terminal Tab (`TerminalTab`)
@@ -160,7 +162,7 @@ All I/O operations use async/await patterns:
 This implementation demonstrates core functionality with:
 - ✅ Functional terminal command execution
 - ✅ Live markdown editing and preview
-- ✅ Mock AI assistant responses
+- ✅ Mock AI assistant responses (now only in demo files; main app uses real LLM)
 - ✅ Plugin status display
 - ✅ Keyboard navigation
 

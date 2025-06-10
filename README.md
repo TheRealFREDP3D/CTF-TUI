@@ -99,6 +99,14 @@ We welcome contributions to the CTF Toolkit! As the project matures, detailed co
 
 This project is currently in its Proof of Concept stage, and a specific open-source license will be chosen and added as the project matures.
 
+## Demo Files
+
+Demo files, such as `ctf-toolkit-demo.html`, have been moved to the `demo/` directory. These files are for demonstration purposes only and are not part of the production AI Assistant code. All mock or simulated AI logic is now isolated from the main application to ensure that only real LLM integration remains in the main codebase.
+
+## Documentation
+
+- [AI Assistant LLM Workflow](docs/3-AI-Assistant/ai-assist-WORKFLOW.md): How the AI Assistant and LLM integration works.
+
 ---
 
 This README provides an overview of the CTF Toolkit project. For more detailed architectural information, please refer to [`docs/ctf_toolkit_overview.md`](docs/ctf_toolkit_overview.md:1).
