@@ -35,9 +35,18 @@ python main.py
 ```
 Before running, ensure you have a `.env` file configured for the AI Assistant, for example:
 ```
-LITELLM_MODEL="ollama/llama3"
-# Or for OpenAI:
+
+# Default LLM model (Free API key)
+LITELLM_MODEL="gemini/gemini-2.0-flash"
+GEMINI_API_KEY="your_gemini_api_key"
+
+# Or use any provider/model supported by `litellm`:
+
 # OPENAI_API_KEY="your_openai_api_key"
+# OPENROUTER_API_KEY="your_openrouter_api_key"
+# GROQ_API_KEY="your_groq_api_key"
+# ...
+
 ```
 
 ## Usage - Key Bindings
@@ -59,7 +68,7 @@ This project is currently in the **Proof of Concept (PoC)** stage. Core function
 *   Keyboard navigation
 
 **Roadmap / Production Readiness Requirements:**
-*   Full integration with LLM APIs (OpenAI, Anthropic, OpenRouter, Local Ollama)
+*   Full integration with LLM APIs (OpenAI, Gemini, Groq, Anthropic, OpenRouter, Local Ollama)
 *   Configuration file management for user settings and API keys
 *   Persistent session data (notes, command history, AI conversations)
 *   Enhanced error handling, logging, and stability
